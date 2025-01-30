@@ -7,44 +7,27 @@ import (
 	"strings"
 )
 
-var comMap = map[string]cliCommand{
-	"exit": {
-		name:        "exit",
-		description: "Exit the Pokedex",
-		callback:    commandExit,
-	},
-	"help": {
-		name:        "help",
-		description: "Displays a help message",
-		callback:    commandHelp,
-	},
-}
-
 func startREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
-		userInput := scanner.Text()
-		if len(userInput) == 0 {
+		words := cleanInput(scanner.Text())
+		if len(words) == 0 {
 			continue
 		}
-		cleanCommand := cleanInput(userInput)
-		command, ok := comMap[cleanCommand[0]]
-		if ok {
+		commandName := words[0]
+		command, exists := getCommands()[commandName]
+		if exists {
 			err := command.callback()
-			if cleanCommand[0] == "help" {
-				for c := range comMap {
-					fmt.Printf("%s: %s\n", c, comMap[c].description)
-				}
-			}
 			if err != nil {
 				fmt.Println(err)
 			}
+			continue
 		} else {
 			fmt.Println("Unknown command")
+			continue
 		}
-
 	}
 }
 
@@ -60,16 +43,4 @@ func cleanInput(text string) []string {
 	}
 	return lowered
 
-}
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex.....Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp() error {
-	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
-	return nil
 }
