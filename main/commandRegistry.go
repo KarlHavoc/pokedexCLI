@@ -9,7 +9,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, string) error
+	callback    func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -39,16 +39,21 @@ func getCommands() map[string]cliCommand {
 			description: "Get the pokemon that exist in a particular area",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch <pokemon>",
+			description: "Try to catch the specified pokemon",
+			callback:    commandCatch,
+		},
 	}
 }
 
-func commandExit(cfg *config, area string) error {
+func commandExit(cfg *config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config, area string) error {
+func commandHelp(cfg *config, args ...string) error {
 	fmt.Println("")
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -60,7 +65,7 @@ func commandHelp(cfg *config, area string) error {
 	return nil
 }
 
-func commandMapf(cfg *config, area string) error {
+func commandMapf(cfg *config, args ...string) error {
 	locationsResp, err := cfg.pokeAPIClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return err
@@ -75,7 +80,7 @@ func commandMapf(cfg *config, area string) error {
 	return nil
 }
 
-func commandMapb(cfg *config, area string) error {
+func commandMapb(cfg *config, args ...string) error {
 	if cfg.previousLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}
@@ -94,11 +99,15 @@ func commandMapb(cfg *config, area string) error {
 	return nil
 }
 
-func commandExplore(cfg *config, area string) error {
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) > 1 {
+		return errors.New("please search for a correct area")
+	}
+	area := args[0]
 	fullURL := "https://pokeapi.co/api/v2/location-area/" + area + "/"
-	areaResp, err := cfg.pokeAPIClient.ListPokemon(&fullURL)
+	areaResp, err := cfg.pokeAPIClient.GetLocation(&fullURL)
 	if err != nil {
-		return err
+		return errors.New("please enter a valid area to explore")
 	}
 	fmt.Println()
 	fmt.Printf("Exploring %s\n", area)
@@ -108,3 +117,5 @@ func commandExplore(cfg *config, area string) error {
 	}
 	return nil
 }
+
+
