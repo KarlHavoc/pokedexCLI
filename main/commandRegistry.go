@@ -44,6 +44,16 @@ func getCommands() map[string]cliCommand {
 			description: "Try to catch the specified pokemon",
 			callback:    commandCatch,
 		},
+		"inspect": {
+			name:        "inspect <pokemon>",
+			description: "Get stats for a pokemon",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "List the pokemon that have been caught",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -117,5 +127,3 @@ func commandExplore(cfg *config, args ...string) error {
 	}
 	return nil
 }
-
-
