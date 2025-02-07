@@ -10,13 +10,14 @@ import (
 )
 
 type config struct {
-	pokeAPIClient     pokeapi.Client
+	pokeAPIClient        pokeapi.Client
 	nextLocationsURL     *string
 	previousLocationsURL *string
 }
 
 func startREPL(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
+	areaName := ""
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -24,10 +25,13 @@ func startREPL(cfg *config) {
 		if len(words) == 0 {
 			continue
 		}
+		if len(words) == 2 {
+			areaName = words[1]
+		}
 		commandName := words[0]
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback(cfg)
+			err := command.callback(cfg, areaName)
 			if err != nil {
 				fmt.Println(err)
 			}

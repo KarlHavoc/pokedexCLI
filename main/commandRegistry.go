@@ -9,7 +9,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -34,28 +34,33 @@ func getCommands() map[string]cliCommand {
 			description: "Get the previous page of location areas",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore <location-area>",
+			description: "Get the pokemon that exist in a particular area",
+			callback:    commandExplore,
+		},
 	}
 }
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, area string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config) error {
+func commandHelp(cfg *config, area string) error {
 	fmt.Println("")
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
 	for _, c := range getCommands() {
-		fmt.Printf("\t%s: \t%s\n", c.name, c.description)
+		fmt.Printf("\t%s:  %s\n", c.name, c.description)
 		fmt.Println()
 	}
 	return nil
 }
 
-func commandMapf(cfg *config) error {
+func commandMapf(cfg *config, area string) error {
 	locationsResp, err := cfg.pokeAPIClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return err
@@ -70,7 +75,7 @@ func commandMapf(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, area string) error {
 	if cfg.previousLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}
@@ -86,5 +91,20 @@ func commandMapb(cfg *config) error {
 		fmt.Println(loc.Name)
 	}
 
+	return nil
+}
+
+func commandExplore(cfg *config, area string) error {
+	fullURL := "https://pokeapi.co/api/v2/location-area/" + area + "/"
+	areaResp, err := cfg.pokeAPIClient.ListPokemon(&fullURL)
+	if err != nil {
+		return err
+	}
+	fmt.Println()
+	fmt.Printf("Exploring %s\n", area)
+	fmt.Println()
+	for _, pokemon := range areaResp.PokemonEncounters {
+		fmt.Println(pokemon.Pokemon.Name)
+	}
 	return nil
 }
