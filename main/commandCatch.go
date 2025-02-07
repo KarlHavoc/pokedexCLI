@@ -4,16 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-
-	"github.com/KarlHavoc/pokedexCLI/internal/pokeapi"
 )
 
-type Pokedex struct {
-	pokemon map[string]pokeapi.PokemonData
-}
-
 func commandCatch(cfg *config, args ...string) error {
-	pokeDex := Pokedex{}
+
 	if len(args) > 1 {
 		return errors.New("you can catch only one")
 	}
@@ -23,13 +17,13 @@ func commandCatch(cfg *config, args ...string) error {
 	if err != nil {
 		return err
 	}
-	// pokeLevel := pokeInfo.BaseExperience
-	// catchPoke := pokeLevel%10
-	fmt.Printf("Trying to catch %s\n", pokeToCatch)
-	randNum := rand.Intn(3)
-	if randNum == 3 {
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokeToCatch)
+	pokeBaseEXP := pokeInfo.BaseExperience
+	randNum := rand.Intn(pokeBaseEXP)
+	if randNum > 40 {
 		fmt.Printf("%s was caught!!\n", pokeToCatch)
-		pokeDex.pokemon[pokeToCatch] = pokeInfo
+		cfg.caughtPokemon[pokeToCatch] = pokeInfo
 	} else {
 		fmt.Printf("%s escaped!\n", pokeToCatch)
 	}
