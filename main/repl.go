@@ -14,14 +14,18 @@ type config struct {
 	nextLocationsURL     *string
 	previousLocationsURL *string
 	caughtPokemon        map[string]pokeapi.Pokemon
+	previousCommands     []string
 }
 
 func startREPL(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
+	// reader := bufio.NewReader(os.Stdin)
+	// commandIndex := 0
 	areaName := ""
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
+
 		words := cleanInput(scanner.Text())
 		if len(words) == 0 {
 			continue
@@ -30,6 +34,9 @@ func startREPL(cfg *config) {
 			areaName = words[1]
 		}
 		commandName := words[0]
+
+		cfg.previousCommands = append(cfg.previousCommands, commandName)
+
 		command, exists := getCommands()[commandName]
 		if exists {
 			err := command.callback(cfg, areaName)

@@ -12,5 +12,6 @@ func main() {
 		pokeAPIClient: pokeClient,
 		caughtPokemon: map[string]pokeapi.Pokemon{},
 	}
+
 	startREPL(cfg)
 }
