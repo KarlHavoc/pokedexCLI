@@ -1,5 +1,4 @@
 # pokedexCLI
 
-##RoadMap
-- add CLI "up" functionality so users can reuse commands
-- persist a user's pokedex to disk so they can save progress
+A simple cli program to explore the areas of the pokemon world, capture pokemon to your pokedex, and inspect the stats of a pokemon.
+Type help for all of the commands and descriptions.
